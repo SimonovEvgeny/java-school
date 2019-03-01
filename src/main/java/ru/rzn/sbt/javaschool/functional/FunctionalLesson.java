@@ -30,6 +30,8 @@ public class FunctionalLesson {
    * Упражнение 1. По порядку становись!<br/>
    * <br/>
    * + для тех, кому скучно: сформулируйте правило сортировки словами и запишите в комментарий
+   * <p>
+   * Сортировка списка по возрастанию суммы цифр числа
    */
   public void sort(List<Integer> list) {
     Collections.sort(list, new Comparator<Integer>() {
@@ -71,6 +73,7 @@ public class FunctionalLesson {
     for (String s : list) {
       out.println(s);
     }
+    out.println(126 % 10);
   }
 
   public void sout_f(List<String> list) {
@@ -128,7 +131,11 @@ public class FunctionalLesson {
   public String ustas2alex_f(List<String> words) {
     StringBuilder sb = new StringBuilder();
 //    words.forEach(s -> sb.append(s.charAt(s.length() / 2)));
-    words.parallelStream().forEachOrdered((s -> sb.append(s.charAt(s.length() / 2))));
+    words.parallelStream()
+            .collect(toList())
+            .forEach(s -> sb.append(s.charAt(s.length() / 2)));
+
+
     return sb.toString();
   }
 
@@ -145,11 +152,13 @@ public class FunctionalLesson {
 
   public String properties_f(Map<String, Object> map) {
     StringBuilder sb = new StringBuilder();
-//    map.forEach((key, value) -> sb.append(String.format("%s=%s\n", key, value)));
     map.entrySet()
             .parallelStream()
-            .forEachOrdered(entryObj -> sb.append(String.format("%s=%s\n", entryObj.getKey(), entryObj.getValue())));
+            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
+            .forEach((key, value) -> sb.append(String.format("%s=%s\n", key, value)));
+
     return sb.toString();
+
   }
 
   /**
@@ -179,6 +188,8 @@ public class FunctionalLesson {
         newList.add(s.toLowerCase());
       }
     }
+    long l = 0;
+    l = +-(l);
     return newList;
   }
 
@@ -233,7 +244,13 @@ public class FunctionalLesson {
   public long countWords_f() throws Exception {
 
     return Files.lines(Paths.get(THIS_FILE))
-            .reduce(0, (x, y) -> x + y.split(WORD_DELIMITERS).length, (x, y) -> x + y);
+            .map(s -> s.split(WORD_DELIMITERS))
+            .flatMap(Arrays::stream)
+            .collect(toList())
+            .size();
+
+//    return Files.lines(Paths.get(THIS_FILE))
+//            .reduce(0, (x, y) -> x + y.split(WORD_DELIMITERS).length, (x, y) -> x + y);
   }
 
   /**
@@ -281,15 +298,14 @@ public class FunctionalLesson {
    */
   public String fWord_f() throws IOException {
 
-    TreeSet<String> otherWords = Files.lines(Paths.get(THIS_FILE))
+    return Files.lines(Paths.get(THIS_FILE))
             .map(s -> s.split(WORD_DELIMITERS))
             .flatMap(Arrays::stream)
             .filter(s -> s.toLowerCase().startsWith("f"))
-            .collect(Collectors.toCollection(TreeSet::new));
+            .distinct()
+            .sorted()
+            .collect(Collectors.joining(" "));
 
-    StringBuilder result = new StringBuilder();
-    otherWords.forEach(s -> result.append(s).append(" "));
-    return result.toString().trim();
 
   }
 
